@@ -30,9 +30,13 @@ router.post('/rateMovie', (req, res) => {
         } 
 
     }).then(() => {
-        
+        /*
+            added to user list of liked movies, and remove from list of hated movies if the user
+            has already rated the movie
+        */
         if(liked) {
-            User.updateOne({userId: userId}, {$push: {likedMovies: movieId}}, (err, result) => {
+            
+            User.updateOne({userId: userId}, {$push: {likedMovies: movieId}, $pull: {hatedMovies: movieId}}, (err, result) => {
                 if(err) {
                     res.status(500).json({
                         status: "error",
@@ -45,8 +49,14 @@ router.post('/rateMovie', (req, res) => {
                     });
                 }
             });
+
+
         } else {
-            User.updateOne({userId: userId}, {$push: {likedMovies: movieId}}, (err, result) => {
+            /*
+                added to user list of hated movies, and remove from list of liked movies if the user
+                has already rated the movie
+            */
+            User.updateOne({userId: userId}, {$push: {hatedMovies: movieId}, $pull: {likedMovies: movieId}}, (err, result) => {
                 if(err) {
                     res.status(500).json({
                         status: "error",
@@ -87,7 +97,7 @@ router.post('/rateShow', (req, res) => {
     }).then(() => {
         
         if(liked) {
-            User.updateOne({userId: userId}, {$push: {likedTvShows: showId}}, (err, result) => {
+            User.updateOne({userId: userId}, {$push: {likedTvShows: showId}, $pull: {hatedMovies: showId}}, (err, result) => {
                 if(err) {
                     res.status(500).json({
                         status: "error",
@@ -101,7 +111,7 @@ router.post('/rateShow', (req, res) => {
                 }
             });
         } else {
-            User.updateOne({userId: userId}, {$push: {likeTvShows: showId}}, (err, result) => {
+            User.updateOne({userId: userId}, {$push: {hatedTvShows: showId}, $pull: {likedTvShows: showId}}, (err, result) => {
                 if(err) {
                     res.status(500).json({
                         status: "error",
@@ -119,6 +129,6 @@ router.post('/rateShow', (req, res) => {
 
 });
 
-            
+      
 
 module.exports = router;
