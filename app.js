@@ -8,7 +8,8 @@ require('dotenv').config({path: './.env'})
 
 
 try {
-  mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true });
+  mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+  mongoose.set('useCreateIndex', true);
 } catch (error) {
   handleError(error);
 }
@@ -17,6 +18,7 @@ try {
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 let newUsers = require('./routes/newUser');
+let findMedia = require('./routes/findMedia');
 
 var app = express();
 
@@ -33,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/new', newUsers);
+app.use('/search', findMedia);
 
 
 // catch 404 and forward to error handler
