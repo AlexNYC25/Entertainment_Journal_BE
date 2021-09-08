@@ -6,7 +6,7 @@ var logger = require('morgan');
 let mongoose = require('mongoose');
 require('dotenv').config({path: './.env'})
 
-
+// connect to monogoDB
 try {
   mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
   mongoose.set('useCreateIndex', true);
@@ -14,11 +14,12 @@ try {
   handleError(error);
 }
 
-
+// express router paths
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 let newUsers = require('./routes/newUser');
 let findMedia = require('./routes/findMedia');
+let addMedia = require('./routes/addMedia');
 
 var app = express();
 
@@ -36,6 +37,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/new', newUsers);
 app.use('/search', findMedia);
+app.use('/add', addMedia);
+
 
 
 // catch 404 and forward to error handler
