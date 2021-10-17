@@ -1,9 +1,11 @@
+// libraries used
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 let mongoose = require('mongoose');
+// configured to use dotenv
 require('dotenv').config({path: './.env'})
 
 // connect to monogoDB
@@ -21,6 +23,7 @@ let newUsers = require('./routes/newUser');
 let findMedia = require('./routes/findMedia');
 let addMedia = require('./routes/addMedia');
 
+// inititalize express
 var app = express();
 
 // view engine setup
