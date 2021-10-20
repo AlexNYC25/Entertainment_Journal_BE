@@ -1,11 +1,10 @@
 let express = require('express');
 let router = express.Router();
-let path = require('path');
 let axios = require('axios').default;
 
 let User = require('../models/user');
 
-
+// helper function to check if a string is a valid number
 let isANumber = (str) => {
     return !isNaN(str);
 };
@@ -17,24 +16,6 @@ let verifyEmailRegex = (emailStr) => {
         return true;
     }
     return false;
-}
-
-// async function to check if there is a valid email account registered in the database
-let validateEmail = (email) => {
-    let regexResult = verifyEmailRegex(email);
-
-    if(!regexResult) {
-        return false;
-    }
-
-    let promise = Use.count({email: email}).then(count => {
-        if(count === 1) {
-            return true;
-        }
-        return false;
-    });
-
-    return promise;
 }
 
 // async helper function to check if a string is a valid tv show id
@@ -145,29 +126,63 @@ router.post('/addTv', (req, res) => {
 
 });
 
+/*
+    Route to add a movie to the users list of movies to watch
+    POST: /addMovie
+    Body: {
+        movieId: <string>
+        email: <string>
+    }
+*/
 router.post('/addMovie', (req, res) => {
-    let movieId = req.body.movieId;
-    let userId = req.body.userId;
+    let movieId = Number.parseInt(req.body.movieId);
+    let userEmail = req.body.userEmail.toString();
+
     // check if the movie id is a valid number to being with
     if (!isANumber(movieId)) {
-        return res.status(400).send('Invalid movieId');
-    }
-    // checks if the user id is a valid number
-    if(!isANumber(userId)){
-        return res.status(400).send('Invalid userId');
-    }
-    // check with the api to see if the movie id is valid
-    if (!validateMovieId(movieId)) {
-        return res.status(400).send('Invalid movieId');
+        return res.status(400).send({status:'error', message:'Provided id must be a number.'});
     }
     
-    User.updateOne({_id: userId}, {$push: {movies: movieId}}, (err, result) => {
-        if (err) {
-            return res.status(500).send({status: 'error', message: 'Error adding movie'});
-        } else {
-            return res.status(200).send({status: 'success', message: 'Movie added'});
+    // check with the api to see if the movie id is valid
+    validateMovieId(movieId).then(result => {
+        if(!result) {
+            res.status(400).send({status:'error', message: 'Invalid movie id.'});
+            return;
         }
-    });
+        else{
+            //check database if there is a user account with that email address
+            User.findOne({email: userEmail}, (err, user) => {
+                // handle database error
+                if (err) {
+                    return res.status(500).send({status:'error', message: 'Error occured while finding user.'});
+                }
+                // handle no user found
+                if (!user) {
+                    return res.status(400).send({status:'error', message: 'User not found.'});
+                }
+
+                // check if the user already has that movie in their list
+                if (user.movies.indexOf(movieId) !== -1) {
+                    return res.status(400).send({status:'error', message:'User already has this given movie on thier watch list.'});
+                }
+                else{
+                    // add the movie to the user's list
+                    user.movies.push(movieId);
+                    user.save((err, user) => {
+                        if (err) {
+                            return res.status(400).send({status:'error', message:'Error saving movie id to their watch list.'});
+                        }
+                        else{
+                            return res.status(200).send({status:'success', message:'Movie added to user\'s watch list.'});
+                        }
+                    });
+                }
+
+                
+            });
+        }
+    })
+    
 
 });
 
