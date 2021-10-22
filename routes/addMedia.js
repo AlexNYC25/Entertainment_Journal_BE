@@ -79,13 +79,13 @@ router.post('/addTv', (req, res) => {
 
     // check if the tvShow id is a valid number to being with
     if (!isANumber(tvShowId)) {
-        return res.status(400).send({status:'error', message:'Provided id must be a number.'});    
+        return res.status(400).json({status:'error', message:'Provided id must be a number.'});    
     }
 
     // check if the tvShow id is a valid tv show id
     validateTvShowId(tvShowId).then(result => {
         if(!result) {
-            res.status(400).send({status:'error', message: 'Invalid tv show id.'});
+            res.status(400).json({status:'error', message: 'Invalid tv show id.'});
             return;
         }
         else{
@@ -93,26 +93,26 @@ router.post('/addTv', (req, res) => {
             User.findOne({email: userEmail}, (err, user) => {
                 // handle database error
                 if (err) {
-                    return res.status(500).send({status:'error', message: 'Error occured while finding user.'});
+                    return res.status(500).json({status:'error', message: 'Error occured while finding user.'});
                 }
                 // handle no user found
                 if (!user) {
-                    return res.status(400).send({status:'error', message: 'User not found.'});
+                    return res.status(400).json({status:'error', message: 'User not found.'});
                 }
 
                 // check if the user already has that tv show in their list
                 if (user.tvShows.indexOf(tvShowId) !== -1) {
-                    return res.status(400).send({status:'error', message:'User already has this given TV Show on thier watch list.'});
+                    return res.status(400).json({status:'error', message:'User already has this given TV Show on thier watch list.'});
                 }
                 else{
                     // add the tv show to the user's list
                     user.tvShows.push(tvShowId);
                     user.save((err, user) => {
                         if (err) {
-                            return res.status(400).send({status:'error', message:'Error saving TV Show id to their watch list.'});
+                            return res.status(400).json({status:'error', message:'Error saving TV Show id to their watch list.'});
                         }
                         else{
-                            return res.status(200).send({status:'success', message:'Tv show added to user\'s watch list.'});
+                            return res.status(200).json({status:'success', message:'Tv show added to user\'s watch list.'});
                         }
                     });
                 }
@@ -140,13 +140,13 @@ router.post('/addMovie', (req, res) => {
 
     // check if the movie id is a valid number to being with
     if (!isANumber(movieId)) {
-        return res.status(400).send({status:'error', message:'Provided id must be a number.'});
+        return res.status(400).json({status:'error', message:'Provided id must be a number.'});
     }
     
     // check with the api to see if the movie id is valid
     validateMovieId(movieId).then(result => {
         if(!result) {
-            res.status(400).send({status:'error', message: 'Invalid movie id.'});
+            res.status(400).json({status:'error', message: 'Invalid movie id.'});
             return;
         }
         else{
@@ -154,26 +154,26 @@ router.post('/addMovie', (req, res) => {
             User.findOne({email: userEmail}, (err, user) => {
                 // handle database error
                 if (err) {
-                    return res.status(500).send({status:'error', message: 'Error occured while finding user.'});
+                    return res.status(500).json({status:'error', message: 'Error occured while finding user.'});
                 }
                 // handle no user found
                 if (!user) {
-                    return res.status(400).send({status:'error', message: 'User not found.'});
+                    return res.status(400).json({status:'error', message: 'User not found.'});
                 }
 
                 // check if the user already has that movie in their list
                 if (user.movies.indexOf(movieId) !== -1) {
-                    return res.status(400).send({status:'error', message:'User already has this given movie on thier watch list.'});
+                    return res.status(400).json({status:'error', message:'User already has this given movie on thier watch list.'});
                 }
                 else{
                     // add the movie to the user's list
                     user.movies.push(movieId);
                     user.save((err, user) => {
                         if (err) {
-                            return res.status(400).send({status:'error', message:'Error saving movie id to their watch list.'});
+                            return res.status(400).json({status:'error', message:'Error saving movie id to their watch list.'});
                         }
                         else{
-                            return res.status(200).send({status:'success', message:'Movie added to user\'s watch list.'});
+                            return res.status(200).json({status:'success', message:'Movie added to user\'s watch list.'});
                         }
                     });
                 }
