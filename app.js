@@ -22,6 +22,7 @@ var usersRouter = require('./routes/users');
 let newUsers = require('./routes/newUser');
 let findMedia = require('./routes/findMedia');
 let addMedia = require('./routes/addMedia');
+let favoriteMedia = require('./routes/favoriteMedia')
 
 // inititalize express
 var app = express();
@@ -40,7 +41,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/new', newUsers);
 app.use('/search', findMedia);
-app.use('/add', addMedia);
+app.use('/watchlist', addMedia);
+app.use('/favorites', favoriteMedia);
 
 
 
