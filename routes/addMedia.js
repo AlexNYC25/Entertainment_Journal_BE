@@ -9,15 +9,6 @@ let isANumber = (str) => {
     return !isNaN(str);
 };
 
-// returns boolean if str is a valid email
-let verifyEmailRegex = (emailStr) => {
-    let email = emailStr.toLowerCase();
-    if(email.match(/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i)) {
-        return true;
-    }
-    return false;
-}
-
 // async helper function to check if a string is a valid tv show id
 let validateTvShowId = (tvShowId) => {
     // call the API to see if the show is actually a tv show
@@ -66,14 +57,14 @@ let validateMovieId = (movieId) => {
 
 /*
     Route to add a tv show to the users list of tv shows to watch
-    POST: /addMedia
+    POST: /watchlist/addTvshow
     Body: {
         tvShowId: <string>
         email: <string>
     }
 
 */
-router.post('/addTv', (req, res) => {
+router.post('/addTvshow', (req, res) => {
     let tvShowId = Number.parseInt(req.body.tvShowId);
     let userEmail = req.body.userEmail.toString();
 
@@ -101,12 +92,12 @@ router.post('/addTv', (req, res) => {
                 }
 
                 // check if the user already has that tv show in their list
-                if (user.tvShows.indexOf(tvShowId) !== -1) {
+                if (user.tvShowWatchlist.indexOf(tvShowId) !== -1) {
                     return res.status(400).json({status:'error', message:'User already has this given TV Show on thier watch list.'});
                 }
                 else{
                     // add the tv show to the user's list
-                    user.tvShows.push(tvShowId);
+                    user.tvShowWatchlist.push(tvShowId);
                     user.save((err, user) => {
                         if (err) {
                             return res.status(400).json({status:'error', message:'Error saving TV Show id to their watch list.'});
@@ -128,7 +119,7 @@ router.post('/addTv', (req, res) => {
 
 /*
     Route to add a movie to the users list of movies to watch
-    POST: /addMovie
+    POST: /watchlist/addMovie
     Body: {
         movieId: <string>
         email: <string>
@@ -162,12 +153,12 @@ router.post('/addMovie', (req, res) => {
                 }
 
                 // check if the user already has that movie in their list
-                if (user.movies.indexOf(movieId) !== -1) {
+                if (user.movieWatchlist.indexOf(movieId) !== -1) {
                     return res.status(400).json({status:'error', message:'User already has this given movie on thier watch list.'});
                 }
                 else{
                     // add the movie to the user's list
-                    user.movies.push(movieId);
+                    user.movieWatchlist.push(movieId);
                     user.save((err, user) => {
                         if (err) {
                             return res.status(400).json({status:'error', message:'Error saving movie id to their watch list.'});
