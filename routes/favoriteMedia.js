@@ -1,7 +1,7 @@
 
 let express = require('express');
 let router = express.Router();
-
+let axios = require('axios');
 let User = require('../models/user');
 
 let isANumber = (str) => {
@@ -59,19 +59,19 @@ let validateMovieId = (movieId) => {
         tvShowId: <string>
     }
 */
-router.post('/favoriteTvShow', (req, res) => {
+router.post('/favoriteTvshow', (req, res) => {
     let tvShowId = Number.parseInt(req.body.tvShowId);
-    let userEmail = req.body.userEmail;
+    let userEmail = req.body.userEmail.toLowerCase();
 
     if(!isANumber(tvShowId)) {
-        return res.status(400).json({status: 400, message: 'Invalid tv show id'});
+        return res.status(400).json({status: 'error', message: 'Invalid tv show id'});
     }
 
     // check if the tv show id is valid
     validateTvShowId(tvShowId)
         .then(result => {
             if(!result){
-                res.status(400).json({status: 400, message: 'Invalid tv show id'});
+                res.status(400).json({status: 'error', message: 'Invalid tv show id'});
             }
             else{
                 // check database to see if the user exists with the email provided
@@ -79,31 +79,34 @@ router.post('/favoriteTvShow', (req, res) => {
                     // handle database error
                     if(err) {
                         console.log(err);
-                        return res.status(500).json({status: 500, message: 'Internal server error'});
+                        return res.status(500).json({status: 'error', message: 'Internal server error'});
                     }
 
                     // handle user not found
                     if(!user) {
-                        return res.status(404).json({status: 400, message: 'User not found'});
+                        return res.status(404).json({status: 'error', message: 'User not found'});
                     }
 
                     // check if the user already has the tv show in thier watchlist and remove it if they do
-                    if(user.tvShows.includes(tvShowId)) {
-                        user.tvShows = user.tvShows.filter(tvShow => tvShow !== tvShowId);
+                    if(user.tvShowWatchlist.includes(tvShowId)) {
+                        user.tvShowWatchlist = user.tvShowWatchlist.filter(tvShow => tvShow !== tvShowId);
                     }
 
                     // add the tv show to the user's favorites
                     if(!user.favoriteTvShows.includes(tvShowId)) {
                         user.favoriteTvShows.push(tvShowId);
                     }
+                    else {
+                        return res.status(400).json({status: 'error', message: 'Tv show already in favorites'});
+                    }
 
                     user.save((err, user) => {
                         if(err) {
                             console.log(err);
-                            return res.status(500).json({status: 500, message: 'Internal server error'});
+                            return res.status(500).json({status: 'error', message: 'Internal server error'});
                         }
 
-                        return res.status(200).json({status: 200, message: 'Successfully added tv show to favorites'});
+                        return res.status(200).json({status: 'success', message: 'Successfully added tv show to favorites'});
                     });
 
                 });
@@ -123,7 +126,7 @@ router.post('/favoriteTvShow', (req, res) => {
 */
 router.post('/favoriteMovie', (req, res) => {
     let movieId = Number.parseInt(req.body.movieId);
-    let userEmail = req.body.email.toString();
+    let userEmail = req.body.userEmail.toString();
 
     if(!isANumber(movieId)){
         return res.status(400).json({status:'error', message: 'Invalid movie id'});
@@ -145,13 +148,16 @@ router.post('/favoriteMovie', (req, res) => {
                 }
 
                 // check if the movie is in the user's watchlist, if so remove it
-                if(user.movies.contains(movieId)){
-                    user.movies = user.movies.filter(movie => movie !== movieId);
+                if(user.movieWatchlist.includes(movieId)){
+                    user.movieWatchlist = user.movieWatchlist.filter(movie => movie !== movieId);
                 }
                 
                 // add the movieId to the users favorite movies, if not already there
-                if(!user.favoriteMovies.contains(movieId)){
+                if(!user.favoriteMovies.includes(movieId)){
                     user.favoriteMovies.push(movieId);
+                }
+                else {
+                    return res.status(400).json({status:'error', message: 'Movie already in favorites'});
                 }
 
                 user.save((err, user) => {
