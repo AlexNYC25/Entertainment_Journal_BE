@@ -19,12 +19,10 @@ let UserSchema = new Schema({
         type: String,
         required: true
     },
-    tvShows: [Number],
-    movies: [Number],
-    likedMovies: [Number],
-    hatedMoveies: [Number],
-    likedTvShows: [Number],
-    hatedTvShows: [Number]
+    tvShowWatchlist: [Number],
+    movieWatchlist: [Number],
+    favoriteTvShows: [Number],
+    favoriteMovies: [Number]
 });
 
 const User = mongoose.model('User', UserSchema);
