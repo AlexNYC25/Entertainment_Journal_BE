@@ -66,7 +66,7 @@ let validateMovieId = (movieId) => {
 */
 router.post('/addTvshow', (req, res) => {
     let tvShowId = Number.parseInt(req.body.tvShowId);
-    let userEmail = req.body.userEmail.toString();
+    let userEmail = req.body.userEmail.toString().toLowerCase();
 
     // check if the tvShow id is a valid number to being with
     if (!isANumber(tvShowId)) {
@@ -90,6 +90,8 @@ router.post('/addTvshow', (req, res) => {
                 if (!user) {
                     return res.status(400).json({status:'error', message: 'User not found.'});
                 }
+
+                
 
                 // check if the user already has that tv show in their list
                 if (user.tvShowWatchlist.indexOf(tvShowId) !== -1) {
