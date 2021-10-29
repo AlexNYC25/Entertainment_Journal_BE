@@ -1,9 +1,7 @@
 let express = require('express');
 let router = express.Router();
-let mongoose = require('mongoose');
 
 let Users = require('../models/user');
-
 
 /*
     Route to remove a tv show from the user's watch list
@@ -66,7 +64,7 @@ router.post('/movie', function(req, res) {
         }
 
         if(!user.movieWatchlist.includes(movieId)){
-            return res.status(400).json({status:"error","message":"Movie is not in movie watchlist"})
+            return res.status(400).json({status: "error", message: "Movie is not in movie watchlist"})
         }
 
         user.movieWatchlist = user.movieWatchlist.filter(function(movie) {
