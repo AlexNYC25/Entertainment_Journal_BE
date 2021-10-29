@@ -48,7 +48,7 @@ let userToReturn = (user) => {
     }
 */
 router.post('/register', (req, res) => {
-    let newUserEmail = req.body.email.toString();
+    let newUserEmail = req.body.email.toString().toLowerCase();
     let newUserPassword = req.body.password.toString();
     let newUserFirstName = req.body.firstName.toString();
     let newUserLastName = req.body.lastName.toString();
@@ -59,11 +59,11 @@ router.post('/register', (req, res) => {
         // check if user already exists
         User.findOne({email: newUserEmail}, (err, user) => {
             if(err) {
-                res.status(500).send({ error: 'Internal server error' });
+                res.status(500).json({ error: 'Internal server error' });
                 return
             }
             if(user) {
-                res.status(400).send({ error: 'User already exists' });
+                res.status(400).json({ error: 'User already exists' });
                 return
             }
             else{
@@ -73,7 +73,7 @@ router.post('/register', (req, res) => {
                     bcrypt.hash(newUserPassword, salt, (err, hash) => {
                         if(err) {
                             // error hashing password
-                            return res.status(500).send({status: 'error', message: 'Error trying to encrypt password', error: err});
+                            return res.status(500).json({status: 'error', message: 'Error trying to encrypt password', error: err});
                         }
                         else {
                             // create new user using User model
@@ -85,9 +85,9 @@ router.post('/register', (req, res) => {
                             }, (err, user) => {
                                 if(err) {
                                     // error creating user
-                                    return res.status(500).send({status: 'error', message: 'Error creating new user', error: err});
+                                    return res.status(500).json({status: 'error', message: 'Error creating new user', error: err});
                                 } else {
-                                    return res.status(200).send({status: 'success', message: 'New user created', user: userToReturn(user)});
+                                    return res.status(200).json({status: 'success', message: 'New user created', user: userToReturn(user)});
                                 }
                             });
                         }
@@ -99,7 +99,7 @@ router.post('/register', (req, res) => {
         
     }
     else {
-        return res.status(400).send({status: 'error', message: 'Invalid email or password'});
+        return res.status(400).json({status: 'error', message: 'Invalid email or password'});
     }
 
 });
