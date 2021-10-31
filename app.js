@@ -10,10 +10,10 @@ require('dotenv').config({path: './.env'})
 
 // connect to monogoDB
 try {
-  mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-  mongoose.set('useCreateIndex', true);
+	mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+	mongoose.set('useCreateIndex', true);
 } catch (error) {
-  handleError(error);
+	handleError(error);
 }
 
 // express router paths
@@ -23,6 +23,8 @@ let newUsers = require('./routes/newUser');
 let findMedia = require('./routes/findMedia');
 let addMedia = require('./routes/addMedia');
 let favoriteMedia = require('./routes/favoriteMedia')
+let removeMediaWatchlist = require('./routes/removeMedia')
+let removeFavorite = require('./routes/removeFavorite')
 
 // inititalize express
 var app = express();
@@ -37,13 +39,27 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// main index route
+// note: this leads to the standard express intro page
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/new', newUsers);
-app.use('/search', findMedia);
-app.use('/watchlist', addMedia);
-app.use('/favorites', favoriteMedia);
 
+// users route to get user information
+app.use('/users', usersRouter);
+// new user route to create new user
+app.use('/newUser', newUsers);
+
+// search route to find media using TMDB API
+app.use('/search', findMedia);
+
+// watchlist route to add media to watchlist's 
+app.use('/watchlist', addMedia);
+// route to remove media from watchlist
+app.use('/removeFromWatchlist', removeMediaWatchlist)
+
+// favorite route to add media to favorites
+app.use('/favorites', favoriteMedia);
+// route to remove media from favorites
+app.use('/removeFavorite', removeFavorite)
 
 
 // catch 404 and forward to error handler
