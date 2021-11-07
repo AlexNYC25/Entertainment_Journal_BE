@@ -8,6 +8,17 @@ let mongoose = require('mongoose');
 // configured to use dotenv
 require('dotenv').config({path: './.env'})
 
+const { auth } = require('express-openid-connect')
+
+const config = {
+  authRequired: false,
+  auth0Logout: true,
+  secret: process.env.AUTH0_SECRET,
+  baseURL: process.env.BASE_URL,
+  clientID: process.env.CLIENT_ID,
+  issuerBaseURL: process.env.ISSUER_BASE_URL,
+};
+
 // connect to monogoDB
 try {
 	mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -29,6 +40,10 @@ let removeFavorite = require('./routes/removeFavorite')
 // inititalize express
 var app = express();
 
+let users = require('./models/user');
+
+app.use(auth(config));
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -38,6 +53,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/test', (req, res) => {
+  res.send(req.oidc.isAuthenticated() ? 'authenticated' : 'not authenticated');
+})
+
+app.get('/profile', (req, res) => {
+  //res.send(JSON.stringify(req.oidc.user))
+
+  if(req.oidc.user){
+    users.findOne({email: req.oidc.user.email}, (err, user) => {
+      res.send(user)
+    })
+  }
+});
+  
 
 // main index route
 // note: this leads to the standard express intro page
