@@ -9,6 +9,7 @@ let mongoose = require('mongoose');
 require('dotenv').config({path: './.env'})
 
 const { auth } = require('express-openid-connect')
+let jwt = require('express-jwt')
 
 const config = {
   authRequired: false,
@@ -67,6 +68,12 @@ app.get('/profile', (req, res) => {
     })
   }
 });
+
+app.get('/token', jwt({secret:process.env.AUTH0_SECRET, algorithms: ['HS256']},
+  (req, res) => {
+    res.send(req.user)
+    }
+))
   
 
 // main index route
