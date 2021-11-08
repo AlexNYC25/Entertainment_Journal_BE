@@ -71,6 +71,7 @@ app.get('/profile', (req, res) => {
 
 app.get('/token', jwt({secret:process.env.AUTH0_SECRET, algorithms: ['HS256']},
   (req, res) => {
+    console.log(req.user)
     res.send(req.user)
     }
 ))
