@@ -8,17 +8,6 @@ let mongoose = require('mongoose');
 // configured to use dotenv
 require('dotenv').config({path: './.env'})
 
-const { auth } = require('express-openid-connect')
-let jwt = require('express-jwt')
-
-const config = {
-  authRequired: false,
-  auth0Logout: true,
-  secret: process.env.AUTH0_SECRET,
-  baseURL: process.env.BASE_URL,
-  clientID: process.env.CLIENT_ID,
-  issuerBaseURL: process.env.ISSUER_BASE_URL,
-};
 
 // connect to monogoDB
 try {
@@ -55,27 +44,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/test', (req, res) => {
-  res.send(req.oidc.isAuthenticated() ? 'authenticated' : 'not authenticated');
-})
-
-app.get('/profile', (req, res) => {
-  //res.send(JSON.stringify(req.oidc.user))
-
-  if(req.oidc.user){
-    users.findOne({email: req.oidc.user.email}, (err, user) => {
-      res.send(user)
-    })
-  }
-});
-
-app.get('/token', jwt({secret:process.env.AUTH0_SECRET, algorithms: ['HS256']},
-  (req, res) => {
-    console.log(req.user)
-    res.send(req.user)
-    }
-))
-  
 
 // main index route
 // note: this leads to the standard express intro page
